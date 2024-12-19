@@ -56,7 +56,7 @@ Setting the environment variable to TF_DEBUG will print somthing like this to yo
 To confirm your paths is resolved as you expect you can set the PRINT_RESOLVED_PATH to True.
 this will print somthing like this
 
-        remove_anchor_pre: - n:/fullgass/feature/asset/prop/bookD/bookD.usda
+        remove_anchor_pre: - M:/film/feature/asset/prop/bookD/bookD.usda
         remove_anchor_post: - asset/prop/bookD/bookD.usda
         newResolvedPath: - \\unc.path.com\film\feature\asset\prop\bookD\bookD.usda
 
