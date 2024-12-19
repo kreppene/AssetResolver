@@ -6,11 +6,14 @@ from functools import wraps
 import re
 from pxr import Ar
 
-# Utils
+# Define the system type
 SYSTEM_IS_LINUX = sys.platform.lower() == "linux"
 SYSTEM_IS_WINDOWS = any([w in sys.platform.lower() for w in ["windows", "win32", "win64", "cygwin"]])
 
+# Get the search paths from the environment variables
 SEARCH_PATHS = os.getenv("AR_SEARCH_PATHS","").split('?')
+
+# wither to cache the asset paths
 AR_CACHE_ASSETPATHS = int(os.getenv("AR_CACHE_ASSETPATHS","1"))
 
 if SYSTEM_IS_LINUX:
@@ -19,20 +22,35 @@ else:
 	SEARCH_PATHS = SEARCH_PATHS[1].split(";")
 
 def debug_print(message, assetPath):
+	"""
+	Prints the resolved path if the environment variable PRINT_RESOLVED_PATH is set to True
+	
+	Args:
+		message (str): The message to print
+		assetPath (str): The asset path to print
+	"""
 
+	# If the environment variable PRINT_RESOLVED_PATH is set to True, print the provided message and asset path
 	if os.getenv('PRINT_RESOLVED_PATH', 'False') == 'True':
 		print (f'{message} - {assetPath}')
 
 def remove_anchor(assetPath):  
-	
+	"""
+	Remove the matching SEARCH_PATHS prefix and adjust leading slashes
+
+	Args:
+		assetPath (str): The asset path to remove the anchor from
+	"""
+
 	assetpath_lowercase = assetPath.lower()
 
-	# Remove the matching SEARCH_PATHS prefix and adjust leading slashes
 	debug_print ('remove_anchor_pre:',  assetPath)
 
+	# strip the anchor from the path
 	for search_path in SEARCH_PATHS:
 
 		if assetpath_lowercase.startswith(search_path.lower()):
+
 			assetPath = assetPath[len(search_path):]
 			assetPath = assetPath.lstrip('/')
 
@@ -43,6 +61,16 @@ def remove_anchor(assetPath):
 	return assetPath
 
 def resolveSearchPath(assetPath):
+	"""
+	Resolve the asset path by searching through the SEARCH_PATHS
+
+	Args:
+		assetPath (str): The asset path to resolve
+
+		Returns:
+		str: The resolved asset path
+	"""
+
 	resolved_asset_path = assetPath
 
 	for anchor in SEARCH_PATHS:
@@ -54,11 +82,21 @@ def resolveSearchPath(assetPath):
 	return assetPath
 
 def resolveLatest(pubfolder):
+	"""
+	Resolve the latest actual version on disk, aka. the highest number in the folder v007
+
+	Args:
+		pubfolder (str): The path to the pub folder
+
+		Returns:
+		str: The latest version
+	"""
 
 	# early out if the pub folder does not exist
 	if not os.path.isdir(pubfolder):
 		return 'latest'
 
+	# Get all elements in the folder
 	versions = os.listdir(pubfolder)
 
 	# Filter elements that start with 'v'
@@ -68,18 +106,29 @@ def resolveLatest(pubfolder):
 		return 'latest'  # No elements start with 'v'
 
 	# Find the element with the highest number
-	max_elem = max(version_list, key=lambda x: int(x[1:]))
+	latest = max(version_list, key=lambda x: int(x[1:]))
 
-	return max_elem
+	# Return the element with the highest number
+	return latest
 
 def findLatestRecursive(filepath):
+	""" 
+	Find the latest version of the asset path recursively
+	
+	Args:
+		filepath (str): The path to the asset file
+
+		Returns:
+		str: The latest version of the asset path
+	"""
 
 	# early out if the pub folder does not exist
 	if not os.path.isfile(filepath):
 		return filepath
 
 	pubfolder = getVersionFolder(filepath)
-	
+
+	# Get all elements in the folder
 	versions = os.listdir(pubfolder)
 
 	# Filter elements that start with 'v'
@@ -87,11 +136,11 @@ def findLatestRecursive(filepath):
 	version_list.sort()  # Orders the list
 	version_list.reverse()  # Reverses the list
 	
+	# early out if no versions are found
 	if not version_list:
 		return filepath
 
 	# Find the element with the highest number
-	#max_elem = max(version_list, key=lambda x: int(x[1:]))
 	for version in version_list:
 		newpath = filepath.replace('latest', version)
 		if os.path.isfile(newpath):
@@ -100,14 +149,24 @@ def findLatestRecursive(filepath):
 	return filepath
 
 def resolveLatestPath(filepath):
+	"""
+	Resolve the latest version of the asset path
 	
+	Args:
+		filepath (str): The path to the  file
+		
+		Returns:
+		str: The latest version of the asset path
+	"""
+
 	search_terms = ["cache/cfxsim", "cache/groom"]  # Specialy roles for cfxsim and groom
 	
 	found = any(term in filepath.replace('\\', '/') for term in search_terms) # Make sure slashes are forward when matching
 	
+	# If the search term is found, find the latest version recursively
 	if found:
 		return findLatestRecursive(filepath)
-		
+	
 	else:
 		versionFolder = getVersionFolder(filepath)        
 		version = resolveLatest(versionFolder)
@@ -115,6 +174,16 @@ def resolveLatestPath(filepath):
 		return filepath.replace('latest', version)
 
 def getAncestorFolder(path, ancestorLevel):
+	"""
+	Get the ancestor folder of the path
+	
+	Args:
+		path (str): The path to the file
+		ancestorLevel (int): The level of the ancestor folder
+		
+		Returns:
+		str: The ancestor folder of the path
+	"""
 	#TODO this can be made more efficient, we dont realy need a loop here
 
 	for i in range(0,ancestorLevel): 
@@ -123,6 +192,15 @@ def getAncestorFolder(path, ancestorLevel):
 	return path
 
 def getVersionFolder(path):
+	"""
+	Get the version folder of the path
+	
+	Args:
+		path (str): The path to the file
+		
+		Returns:
+		str: The version folder of the path
+	"""
 
 	folderName = os.path.dirname(path)
 	versionFolder = folderName.lower().split('latest')[0]
@@ -249,9 +327,9 @@ class ResolverContext:
 			print ('Clear Asset Resolver')
 			return 'S:/pipeline/qscripts/qsd/qsd-dev/qsd/asset_resolver/reload.usd'
 
-
+		
 		if assetPath.startswith("relativePath|"):
-
+			
 			relative_path, anchor_path = assetPath.removeprefix("relativePath|").split("?")
 			anchor_path, ancestorLevel = anchor_path.split('!')
 
@@ -278,7 +356,7 @@ class ResolverContext:
 			if os.path.isfile(resolved_asset_path):
 				context.AddCachingPair(assetPath, resolved_asset_path)
 
-		debug_print ('newResolvedPath:',  assetPath)
+		debug_print ('newResolvedPath:',  resolved_asset_path)
 
 		return resolved_asset_path
 
