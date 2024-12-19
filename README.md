@@ -58,15 +58,15 @@ this will print somthing like this
 
         remove_anchor_pre: - n:/fullgass/feature/asset/prop/bookD/bookD.usda
         remove_anchor_post: - asset/prop/bookD/bookD.usda
-        newResolvedPath: - \\storage.qvisten.no\film\fullgass\feature\asset\prop\bookD\bookD.usda
+        newResolvedPath: - \\unc.path.com\film\feature\asset\prop\bookD\bookD.usda
 
-        remove_anchor_pre: - //storage.qvisten.no/film/fullgass/feature/asset/prop/bookD/look/default/pub/latest/bookD-look-default-latest.usd
+        remove_anchor_pre: - //unc.path.com/film/feature/asset/prop/bookD/look/default/pub/latest/bookD-look-default-latest.usd
         remove_anchor_post: - asset/prop/bookD/look/default/pub/latest/bookD-look-default-latest.usd
-        newResolvedPath: - \\storage.qvisten.no\film\fullgass\feature\asset\prop\bookD\look\default\pub\v002\bookD-look-default-v002.usd
+        newResolvedPath: - \\unc.path.com\film\feature\asset\prop\bookD\look\default\pub\v002\bookD-look-default-v002.usd
 
-        remove_anchor_pre: - //storage.qvisten.no/film/fullgass/feature/asset/prop/bookD/model/default/pub/latest/bookD-model-default-latest.usd
+        remove_anchor_pre: - //unc.path.com/film/feature/asset/prop/bookD/model/default/pub/latest/bookD-model-default-latest.usd
         remove_anchor_post: - asset/prop/bookD/model/default/pub/latest/bookD-model-default-latest.usd
-        newResolvedPath: - \\storage.qvisten.no\film\fullgass\feature\asset\prop\bookD\model\default\pub\v003\bookD-model-default-v003.usd
+        newResolvedPath: - \\unc.path.com\film\feature\asset\prop\bookD\model\default\pub\v003\bookD-model-default-v003.usd
 
 
 ## Dev
