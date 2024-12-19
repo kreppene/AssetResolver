@@ -3,4 +3,7 @@
 *.so
 __pycache__/
 *.lib
+*.pyd
+*.Json
+__init__.py
 ```
