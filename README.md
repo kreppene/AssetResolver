@@ -1,4 +1,3 @@
-# AssetResolver
 # Qvistens - Asset Resolver - PythonExpose
 **Author:** Raymond Kreppene
 
