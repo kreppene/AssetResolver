@@ -17,7 +17,7 @@ SEARCH_PATHS = os.getenv("AR_SEARCH_PATHS","").split('?')
 AR_CACHE_ASSETPATHS = int(os.getenv("AR_CACHE_ASSETPATHS","1"))
 
 if SYSTEM_IS_LINUX:
-	SEARCH_PATHS = SEARCH_PATHS[0].split(":")
+	SEARCH_PATHS = SEARCH_PATHS[0].split(";")
 else:
 	SEARCH_PATHS = SEARCH_PATHS[1].split(";")
 
@@ -44,11 +44,12 @@ def remove_anchor(assetPath):
 
 	assetpath_lowercase = assetPath.lower()
 
+	debug_print ('SEARCHPATHS:', SEARCH_PATHS)
 	debug_print ('remove_anchor_pre:',  assetPath)
 
 	# strip the anchor from the path
 	for search_path in SEARCH_PATHS:
-
+		
 		if assetpath_lowercase.startswith(search_path.lower()):
 
 			assetPath = assetPath[len(search_path):]
